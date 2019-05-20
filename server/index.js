@@ -1,6 +1,11 @@
+require('dotenv').config()
+
 const express = require('express')
 const consola = require('consola')
 const { Nuxt, Builder } = require('nuxt')
+const mysql = require('mysql')
+const bodyParser = require('body-parser')
+
 const app = express()
 
 // Import and Set Nuxt.js options
