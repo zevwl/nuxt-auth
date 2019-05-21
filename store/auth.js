@@ -1,4 +1,5 @@
-import axios from '~/plugins/axios'
+import axios, { setAuthToken, removeAuthToken } from '~/plugins/axios'
+import cookies from 'js-cookie'
 
 export const state = () => ({
   user: null
@@ -26,6 +27,8 @@ export const actions = {
     try {
       const response = await axios.post('/login', credentials)
       commit('SET_USER', response.data.user)
+      setAuthToken(response.data.token)
+      cookies.set('x-access-token', response.data.token, { expires: 30 })
       return response
     } catch (error) {
       return error
@@ -34,6 +37,8 @@ export const actions = {
 
   logout({ commit }) {
     commit('SET_USER', null)
+    removeAuthToken()
+    cookies.remove('x-access-token')
     return Promise.resolve()
   }
 }

@@ -10,8 +10,10 @@
           <p v-else>The user is not authenticated!</p>
         </v-card-text>
         <v-card-actions>
-          <v-btn color="primary" flat @click="$store.dispatch('auth/fetch')">Check Me</v-btn>
           <v-btn color="primary" flat nuxt  to="/">Main Page</v-btn>
+
+          <v-btn v-if="!user" color="primary" flat nuxt to="/login">Login</v-btn>
+          <v-btn v-else color="primary" flat @click="logoutAndRedirect">Logout</v-btn>
         </v-card-actions>
       </v-card>
     </v-flex>
@@ -19,10 +21,23 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
+
 export default {
-  computed: {
-    user() {
-      return (this.$store.state.auth || {}).user || null
+  middleware: 'auth',
+
+  computed: mapState('auth', [
+    'user'
+  ]),
+
+  methods: {
+    ...mapActions({
+      logout: 'auth/logout'
+    }),
+
+    async logoutAndRedirect() {
+      await this.logout()
+      this.$router.push('/')
     }
   }
 }
