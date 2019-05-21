@@ -13,6 +13,8 @@
         <logo />
         <vuetify-logo />
       </div>
+      <v-btn color="primary" flat nuxt to="/login">Login</v-btn>
+      <v-btn color="primary" flat nuxt to="/admin">Admin</v-btn>
       <v-card>
         <v-card-title class="headline">Welcome to the Vuetify + Nuxt.js template</v-card-title>
         <v-card-text>
