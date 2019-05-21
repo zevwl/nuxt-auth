@@ -5,8 +5,20 @@ const consola = require('consola')
 const { Nuxt, Builder } = require('nuxt')
 const mysql = require('mysql')
 const bodyParser = require('body-parser')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 const app = express()
+const db = mysql.createConnection(process.env.DB_URL)
+const envToken = process.env.TOKEN
+
+// Server middleware
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
+
+// Routes
+const routes = require('./routes')
+app.use('/', routes({express, db, bcrypt, jwt, envToken}))
 
 // Import and Set Nuxt.js options
 let config = require('../nuxt.config.js')
