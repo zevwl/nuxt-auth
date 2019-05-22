@@ -35,6 +35,18 @@ export const actions = {
     }
   },
 
+  async loginGoogle({ commit }, token) {
+    try {
+      const response = await axios.post('/google', { token })
+      commit('SET_USER', response.data.user)
+      setAuthToken(response.data.token)
+      cookies.set('x-access-token', response.data.token, { expires: 30 })
+      return response
+    } catch (error) {
+      return error
+    }
+  },
+
   logout({ commit }) {
     commit('SET_USER', null)
     removeAuthToken()

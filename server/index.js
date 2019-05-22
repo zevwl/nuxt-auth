@@ -7,6 +7,7 @@ const mysql = require('mysql')
 const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const { google } = require('googleapis')
 
 const app = express()
 const db = mysql.createConnection(process.env.DB_URL)
@@ -18,7 +19,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 
 // Routes
 const routes = require('./routes')
-app.use('/', routes({express, db, bcrypt, jwt, envToken}))
+app.use('/', routes({express, db, bcrypt, jwt, google}))
 
 // Import and Set Nuxt.js options
 let config = require('../nuxt.config.js')

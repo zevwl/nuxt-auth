@@ -25,7 +25,8 @@ module.exports = {
   },
 
   env: {
-    baseUrl: process.env.BASE_URL || 'http://127.0.0.1:3000'
+    baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+    googleClientId: process.env.GOOGLE_CLIENT_ID
   },
 
   /*

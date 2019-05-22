@@ -13,6 +13,7 @@
         </v-card-text>
         <v-card-actions>
           <v-btn type="submit" color="primary" block :loading="loading" :disabled="loading">Login</v-btn>
+          <v-btn v-if="googleReady" color="red white--text" @click="googleSubmit" :loading="googleLoading" :disabled="googleLoading">Login with Google</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -21,6 +22,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+
 export default {
   layout: 'fullscreen',
 
@@ -29,13 +31,43 @@ export default {
       email: '',
       password: '',
       alert: null,
-      loading: false
+      loading: false,
+      googleLoading: false,
+      googleReady: false
     }
+  },
+
+  mounted() {
+    window.gapiOnLoadCallback = () => {
+      window.gapi.load('auth2', () => {
+        window.google_auth2 = window.gapi.auth2.init({
+          client_id: process.env.googleClientId,
+          fetch_basic_profile: false,
+          scope: 'profile email'
+        })
+      })
+      this.googleReady = true
+    }
+
+    const installGoogleSdkScript = (d, s, id) => {
+      if (d.getElementById(id)) {
+        this.google_sdk_initialized = true
+        return
+      }
+
+      let fjs = d.querySelector(s)
+      let js = d.createElement(s)
+      js.id = id
+      js.src = 'https://apis.google.com/js/platform.js?onload=gapiOnLoadCallback',
+      fjs.parentNode.insertBefore(js, fjs)
+    }
+    installGoogleSdkScript(document, 'script', 'google-jssdk')
   },
 
   methods: {
     ...mapActions({
-      login: 'auth/login'
+      login: 'auth/login',
+      loginGoogle: 'auth/loginGoogle'
     }),
 
     async submit() {
@@ -76,7 +108,47 @@ export default {
           console.log('login error', error)
         }
       }
+    },
 
+    async googleSubmit() {
+      if (!this.googleReady) return
+
+      this.alert = null
+      this.googleLoading = true
+
+      try {
+        await window.google_auth2.signIn()
+        const result = await this.loginGoogle(window.google_auth2.currentUser.get().Zi.access_token)
+
+        // If there is an error
+        if (result.response) {
+          // Pass the result to the catch block
+          throw result
+        }
+
+        this.alert = {
+          type: 'success',
+          message: result.data.message
+        }
+
+        this.googleLoading = false
+
+        // Show the message for one second
+        setTimeout(() => {
+          this.$router.push('/admin')
+        }, 1000);
+      } catch (error) {
+        this.googleLoading = false
+
+        if (error.response && error.response.data) {
+          this.alert = {
+            type: 'error',
+            message: error.response.data.message || error.response.status
+          }
+        } else {
+          console.log('login error', error)
+        }
+      }
     }
   }
 }
