@@ -2,12 +2,17 @@ import axios, { setAuthToken, removeAuthToken } from '~/plugins/axios'
 import cookies from 'js-cookie'
 
 export const state = () => ({
-  user: null
+  user: null,
+  redirectUrl: null
 })
 
 export const mutations = {
   SET_USER(state, user) {
     state.user = user
+  },
+
+  SET_REDIRECT_URL(state, redirectUrl) {
+    state.redirectUrl = redirectUrl
   }
 }
 
@@ -37,6 +42,10 @@ export const actions = {
     cookies.remove('x-access-token')
     this.$router.push('/')
     return Promise.resolve()
+  },
+
+  setRedirectUrl({ commit }, url) {
+    commit('SET_REDIRECT_URL', url)
   }
 }
 

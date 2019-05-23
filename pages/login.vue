@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   layout: 'fullscreen',
@@ -37,7 +37,15 @@ export default {
     }
   },
 
+  computed: mapState('auth', ['redirectUrl']),
+
   mounted() {
+    const nextRoute = this.$route.query.next
+    this.setRedirectUrl(nextRoute)
+
+    // Leave a clean url
+    this.$router.push({ query: null })
+
     window.gapiOnLoadCallback = () => {
       window.gapi.load('auth2', () => {
         window.google_auth2 = window.gapi.auth2.init({
@@ -67,7 +75,8 @@ export default {
   methods: {
     ...mapActions('auth', [
       'login',
-      'loginGoogle'
+      'loginGoogle',
+      'setRedirectUrl'
     ]),
 
     submit() {
@@ -125,7 +134,7 @@ export default {
 
         // Show the message for one second
         setTimeout(() => {
-          this.$router.push('/admin')
+          this.$router.push(this.redirectUrl || '/admin')
         }, 1000);
       } catch (error) {
         if (type === 'google') {
