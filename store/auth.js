@@ -23,28 +23,12 @@ export const actions = {
     }
   },
 
-  async login({ commit }, credentials) {
-    try {
-      const response = await axios.post('/login', credentials)
-      commit('SET_USER', response.data.user)
-      setAuthToken(response.data.token)
-      cookies.set('x-access-token', response.data.token, { expires: 30 })
-      return response
-    } catch (error) {
-      return error
-    }
+  login({ commit }, credentials) {
+    return _login(commit, '/login', credentials)
   },
 
-  async loginGoogle({ commit }, token) {
-    try {
-      const response = await axios.post('/google', { token })
-      commit('SET_USER', response.data.user)
-      setAuthToken(response.data.token)
-      cookies.set('x-access-token', response.data.token, { expires: 30 })
-      return response
-    } catch (error) {
-      return error
-    }
+  loginGoogle({ commit }, token) {
+    return _login(commit, '/google', { token })
   },
 
   logout({ commit }) {
@@ -53,5 +37,17 @@ export const actions = {
     cookies.remove('x-access-token')
     this.$router.push('/')
     return Promise.resolve()
+  }
+}
+
+async function _login(commit, url, data) {
+  try {
+    const response = await axios.post(url, data)
+    commit('SET_USER', response.data.user)
+    setAuthToken(response.data.token)
+    cookies.set('x-access-token', response.data.token, { expires: 30 })
+    return response
+  } catch (error) {
+    return error
   }
 }

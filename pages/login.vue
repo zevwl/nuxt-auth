@@ -65,60 +65,46 @@ export default {
   },
 
   methods: {
-    ...mapActions({
-      login: 'auth/login',
-      loginGoogle: 'auth/loginGoogle'
-    }),
+    ...mapActions('auth', [
+      'login',
+      'loginGoogle'
+    ]),
 
-    async submit() {
-      this.alert = null
-      this.loading = true
-
-      try {
-        const result = await this.login({
-          email: this.email,
-          password: this.password
-        })
-
-        // If there is an error
-        if (result.response) {
-          // Pass the result to the catch block
-          throw result
-        }
-
-        this.alert = {
-          type: 'success',
-          message: result.data.message
-        }
-        this.loading = false
-
-        // Show the message for one second
-        setTimeout(() => {
-          this.$router.push('/admin')
-        }, 1000);
-      } catch (error) {
-        this.loading = false
-
-        if (error.response && error.response.data) {
-          this.alert = {
-            type: 'error',
-            message: error.response.data.message || error.response.status
-          }
-        } else {
-          console.log('login error', error)
-        }
-      }
+    submit() {
+      return this._login()
     },
 
     async googleSubmit() {
-      if (!this.googleReady) return
+      this._login('google')
+    },
+
+    async _login(type) {
+      if (type === 'google') {
+        if (!this.googleReady) {
+          return
+        } else {
+          this.googleLoading = true
+        }
+      } else {
+        // email-password login
+        this.loading = true
+      }
 
       this.alert = null
-      this.googleLoading = true
 
       try {
-        await window.google_auth2.signIn()
-        const result = await this.loginGoogle(window.google_auth2.currentUser.get().Zi.access_token)
+        let result
+
+        if (type=== 'google') {
+          await window.google_auth2.signIn()
+          result = await this.loginGoogle(window.google_auth2.currentUser.get().Zi.access_token)
+
+        } else {
+          result = await this.login({
+            email: this.email,
+            password: this.password
+          })
+        }
 
         // If there is an error
         if (result.response) {
@@ -131,14 +117,22 @@ export default {
           message: result.data.message
         }
 
-        this.googleLoading = false
+        if (type === 'google') {
+          this.googleLoading = false
+        } else {
+          this.loading = false
+        }
 
         // Show the message for one second
         setTimeout(() => {
           this.$router.push('/admin')
         }, 1000);
       } catch (error) {
-        this.googleLoading = false
+        if (type === 'google') {
+          this.googleLoading = false
+        } else {
+          this.loading = false
+        }
 
         if (error.response && error.response.data) {
           this.alert = {
