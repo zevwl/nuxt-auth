@@ -51,7 +51,7 @@ export default {
 
     const installGoogleSdkScript = (d, s, id) => {
       if (d.getElementById(id)) {
-        this.google_sdk_initialized = true
+        this.googleReady = true
         return
       }
 
