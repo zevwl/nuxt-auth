@@ -14,7 +14,7 @@ export const mutations = {
 export const actions = {
   async fetch({ commit }) {
     try {
-      const response = await axios.get('/me')
+      const response = await axios.get('/fetch')
       commit('SET_USER', response.data.result)
       return response
     } catch (error) {
@@ -51,6 +51,7 @@ export const actions = {
     commit('SET_USER', null)
     removeAuthToken()
     cookies.remove('x-access-token')
+    this.$router.push('/')
     return Promise.resolve()
   }
 }

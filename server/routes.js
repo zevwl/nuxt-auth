@@ -82,7 +82,7 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
     })
   })
 
-  router.get('/me', (req, res) => {
+  router.get('/fetch', (req, res) => {
     const accessToken = req.headers['x-access-token']
     if (!accessToken) {
       return res.status(400).json({

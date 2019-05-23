@@ -2,7 +2,7 @@
   <v-layout column justify-center align-center>
     <v-flex xs12 sm8 md6>
       <v-card>
-        <v-card-title class="headline">Admin Page</v-card-title>
+        <v-card-title class="headline">Profile Page</v-card-title>
 
         <v-card-text>
           <p v-if="user">Hello, {{ user.email }}</p>
@@ -37,4 +37,3 @@ export default {
   }
 }
 </script>
-
