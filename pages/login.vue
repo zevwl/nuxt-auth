@@ -88,7 +88,9 @@ export default {
     },
 
     async _login(type) {
-      if (type === 'google') {
+      const googleLogin = type === 'google'
+
+      if (googleLogin) {
         if (!this.googleReady) {
           return
         } else {
@@ -104,7 +106,7 @@ export default {
       try {
         let result
 
-        if (type=== 'google') {
+        if (googleLogin) {
           await window.google_auth2.signIn()
           result = await this.loginGoogle(window.google_auth2.currentUser.get().Zi.access_token)
 
@@ -126,7 +128,7 @@ export default {
           message: result.data.message
         }
 
-        if (type === 'google') {
+        if (googleLogin) {
           this.googleLoading = false
         } else {
           this.loading = false
@@ -137,7 +139,7 @@ export default {
           this.$router.push(this.redirectUrl || '/admin')
         }, 1000);
       } catch (error) {
-        if (type === 'google') {
+        if (googleLogin) {
           this.googleLoading = false
         } else {
           this.loading = false
