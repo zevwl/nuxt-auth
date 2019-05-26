@@ -10,6 +10,8 @@
           <v-text-field label="Email" v-model="email" />
 
           <v-text-field label="Password" v-model="password" type="password" />
+
+          <v-checkbox v-model="remember" color="primary" label="Remember Me" />
         </v-card-text>
         <v-card-actions>
           <v-btn type="submit" color="primary" block :loading="loading" :disabled="loading">Login</v-btn>
@@ -30,6 +32,7 @@ export default {
     return {
       email: '',
       password: '',
+      remember: false,
       alert: null,
       loading: false,
       googleLoading: false,
@@ -108,12 +111,16 @@ export default {
 
         if (googleLogin) {
           await window.google_auth2.signIn()
-          result = await this.loginGoogle(window.google_auth2.currentUser.get().Zi.access_token)
+          result = await this.loginGoogle({
+            token: window.google_auth2.currentUser.get().Zi.access_token,
+            remember: this.remember
+          })
 
         } else {
           result = await this.login({
             email: this.email,
-            password: this.password
+            password: this.password,
+            remember: this.remember
           })
         }
 

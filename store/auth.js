@@ -32,8 +32,8 @@ export const actions = {
     return _login(commit, '/login', credentials)
   },
 
-  loginGoogle({ commit }, token) {
-    return _login(commit, '/google', { token })
+  loginGoogle({ commit }, data) {
+    return _login(commit, '/google', data)
   },
 
   logout({ commit }) {
@@ -49,12 +49,15 @@ export const actions = {
   }
 }
 
-async function _login(commit, url, data) {
+async function _login(commit, url, { remember, ...data}) {
   try {
     const response = await axios.post(url, data)
     commit('SET_USER', response.data.user)
-    setAuthToken(response.data.token)
-    cookies.set('x-access-token', response.data.token, { expires: 30 })
+
+    const token = response.data.token
+    setAuthToken(token)
+    cookies.set('x-access-token', token, { expires: remember ? 180 : '' })
+
     return response
   } catch (error) {
     return error
