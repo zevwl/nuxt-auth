@@ -11,7 +11,6 @@ const { google } = require('googleapis')
 
 const app = express()
 const db = mysql.createConnection(process.env.DB_URL)
-const envToken = process.env.TOKEN
 
 // Server middleware
 app.use(bodyParser.json())

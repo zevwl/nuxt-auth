@@ -67,7 +67,7 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
                 id: user.id,
                 email: user.email
               },
-              process.env.TOKEN, {
+              process.env.SECRET, {
                 expiresIn: '30d'
               }
             ),
@@ -91,7 +91,7 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
       })
     }
 
-    jwt.verify(accessToken, process.env.TOKEN, (error, result) => {
+    jwt.verify(accessToken, process.env.SECRET, (error, result) => {
       if (error) {
         return res.status(403).json({
           type: 'error',
@@ -164,7 +164,7 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
           token: jwt.sign({
             id: user.id,
             email: user.email
-          }, process.env.TOKEN, { expiresIn: '30d' })
+          }, process.env.SECRET, { expiresIn: '30d' })
         })
       })
     })
