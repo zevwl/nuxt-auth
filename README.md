@@ -1,6 +1,8 @@
-# nuxt-auth
+# Nuxt Authentication
 
-> My impeccable Nuxt.js project
+> This app is built on the foundation of this great article: [Nuxt Authentication from Scratch
+](https://codeburst.io/nuxt-authentication-from-scratch-a7a024c7201b), adding my own tweaks and enhancements.
+
 
 ## Build Setup
 
