@@ -26,7 +26,7 @@
 import { mapActions, mapState } from 'vuex'
 
 export default {
-  layout: 'fullscreen',
+  layout: 'empty',
 
   data() {
     return {
