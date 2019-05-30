@@ -52,7 +52,7 @@ export default {
     window.gapiOnLoadCallback = () => {
       window.gapi.load('auth2', () => {
         window.google_auth2 = window.gapi.auth2.init({
-          client_id: process.env.googleClientId,
+          client_id: '626186623920-l1k73j4v7tcprpep3obakbn3rnmd254h.apps.googleusercontent.com', // will only work for white-listed domains
           fetch_basic_profile: false,
           scope: 'profile email'
         })
