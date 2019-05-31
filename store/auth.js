@@ -29,15 +29,15 @@ export const actions = {
   },
 
   login({ commit }, credentials) {
-    return _login(commit, '/login', credentials)
+    return auth(commit, '/login', credentials)
   },
 
   loginGoogle({ commit }, data) {
-    return _login(commit, '/google', data)
+    return auth(commit, '/google', data)
   },
 
   signup({ commit }, credentials) {
-    return _login(commit, '/signup', credentials)
+    return auth(commit, '/signup', credentials)
   },
 
   logout({ commit }) {
@@ -53,7 +53,7 @@ export const actions = {
   }
 }
 
-async function _login(commit, url, { remember, ...data}) {
+async function auth(commit, url, { remember, ...data}) {
   try {
     const response = await axios.post(url, data)
     commit('SET_USER', response.data.user)
