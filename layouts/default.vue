@@ -15,7 +15,7 @@
 
       <template v-else>
         <v-btn color="primary" flat nuxt to="/me">Profile</v-btn>
-        <v-btn color="primary" flat nuxt to="/admin">Admin</v-btn>
+        <v-btn v-if="user.admin" color="primary" flat nuxt to="/admin">Admin</v-btn>
       </template>
     </v-toolbar>
     <v-content>

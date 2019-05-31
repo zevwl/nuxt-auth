@@ -143,7 +143,7 @@ export default {
 
         // Show the message for one second
         setTimeout(() => {
-          this.$router.push(this.redirectUrl || '/admin')
+          this.$router.push(this.redirectUrl || '/me')
         }, 1000);
       } catch (error) {
         if (googleLogin) {

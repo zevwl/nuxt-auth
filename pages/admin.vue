@@ -24,7 +24,7 @@
 import { mapActions, mapState } from 'vuex'
 
 export default {
-  middleware: 'auth',
+  middleware: 'admin',
 
   computed: mapState('auth', [
     'user'

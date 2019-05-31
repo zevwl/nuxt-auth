@@ -72,17 +72,17 @@ module.exports = ({express, db, crypt, jwt, google}) => {
     const result = crypt.compare(password, user.password)
 
     if (result) {
+      user = {
+        id: user.id,
+        email: user.email,
+        admin: !!user.admin
+      }
+
       res.json({
         type: 'success',
         message: 'User logged in.',
-        user: {
-          id: user.id,
-          email: user.email
-        },
-        token: jwt.sign({
-            id: user.id,
-            email: user.email
-          },
+        user,
+        token: jwt.sign(user,
           process.env.SECRET, {
             expiresIn: '30d'
           }
@@ -169,18 +169,18 @@ module.exports = ({express, db, crypt, jwt, google}) => {
         })
       }
 
-      const user = rows[0]
+      let user = rows[0]
+      user = {
+        id: user.id,
+        email: user.email,
+        admin: !!user.admin
+      }
+
       res.json({
         type: 'success',
         message: 'User logged in with Google.',
-        user: {
-          id: user.id,
-          email: user.email
-        },
-        token: jwt.sign({
-          id: user.id,
-          email: user.email
-        }, process.env.SECRET, { expiresIn: '30d' })
+        user,
+        token: jwt.sign(user, process.env.SECRET, { expiresIn: '30d' })
       })
     })
   })
