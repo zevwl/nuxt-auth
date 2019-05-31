@@ -36,6 +36,10 @@ export const actions = {
     return _login(commit, '/google', data)
   },
 
+  signup({ commit }, credentials) {
+    return _login(commit, '/signup', credentials)
+  },
+
   logout({ commit }) {
     commit('SET_USER', null)
     removeAuthToken()

@@ -8,7 +8,10 @@
 
       <v-spacer />
 
-      <v-btn v-if="!user" color="primary" flat nuxt to="/login">Login</v-btn>
+      <template v-if="!user">
+        <v-btn color="primary" flat nuxt to="/signup">Signup</v-btn>
+        <v-btn color="primary" flat nuxt to="/login">Login</v-btn>
+      </template>
 
       <template v-else>
         <v-btn color="primary" flat nuxt to="/me">Profile</v-btn>

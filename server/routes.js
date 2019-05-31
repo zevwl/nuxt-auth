@@ -1,5 +1,7 @@
 require('dotenv').config()
 
+const db2 = require('./lib/mysql')
+
 module.exports = ({express, db, bcrypt, jwt, google}) => {
   const router =  express.Router()
 
@@ -18,6 +20,55 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
         result
       })
     })
+  })
+
+  router.post('/signup', async (req, res) => {
+    const  { email, password } = req.body
+    if (!email || !password) {
+      return res.status(400).json({
+        type: 'error',
+        message: 'Email and password is required.'
+      })
+    }
+
+    let hashedPassword = ''
+
+    try {
+      // TODO: is it secure?
+      hashedPassword = await bcrypt.hash(password, 8)
+    } catch(error) {
+      return res.status(500).json({
+        type: 'error',
+        message: 'Hash generation error.',
+        error
+      })
+    }
+
+    try {
+      const result = await db2.runQuery('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword])
+
+      const user = {
+        email,
+        id: result.insertId,
+        admin: false
+      }
+
+      const token = jwt.sign(user, process.env.SECRET)
+
+      res.json({
+        type: 'success',
+        message: 'New user created.',
+        user,
+        token
+      })
+    } catch (error) {
+      console.log('server', error)
+      res.status(500).json({
+        type: 'error',
+        message: 'Database error',
+        error
+      })
+    }
   })
 
   router.post('/login', (req, res) => {
