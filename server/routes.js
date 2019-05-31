@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-module.exports = ({express, db, bcrypt, jwt, google}) => {
+module.exports = ({express, db, crypt, jwt, google}) => {
   const router =  express.Router()
 
   router.post('/signup', async (req, res) => {
@@ -12,18 +12,7 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
       })
     }
 
-    let hashedPassword = ''
-
-    try {
-      // TODO: is it secure?
-      hashedPassword = await bcrypt.hash(password, 8)
-    } catch(error) {
-      return res.status(500).json({
-        type: 'error',
-        message: 'Hash generation error.',
-        error
-      })
-    }
+    const hashedPassword = crypt.hash(password, 8)
 
     let result
     try {
@@ -79,17 +68,8 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
       })
     }
 
-    const user = rows[0]
-    let result
-    try {
-      result = await bcrypt.compare(password, user.password)
-    } catch (error) {
-      return res.status(500).json({
-        type: 'error',
-        message: 'Bcrypt error.',
-        error
-      })
-    }
+    let user = rows[0]
+    const result = crypt.compare(password, user.password)
 
     if (result) {
       res.json({

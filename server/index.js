@@ -5,11 +5,11 @@ const consola = require('consola')
 const { Nuxt, Builder } = require('nuxt')
 const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
 const { google } = require('googleapis')
 
 const app = express()
 const db = require('./lib/mysql')
+const crypt = require('./lib/crypt')
 
 // Server middleware
 app.use(bodyParser.json())
@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 
 // Routes
 const routes = require('./routes')
-app.use('/', routes({express, db, bcrypt, jwt, google}))
+app.use('/', routes({express, db, crypt, jwt, google}))
 
 // Import and Set Nuxt.js options
 let config = require('../nuxt.config.js')
