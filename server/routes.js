@@ -5,23 +5,6 @@ const db2 = require('./lib/mysql')
 module.exports = ({express, db, bcrypt, jwt, google}) => {
   const router =  express.Router()
 
-  router.get('/test', (req, res) => {
-    db.query('SELECT 1 + 1', (error, result) => {
-      if (error) {
-        return res.status(500).json({
-          type: 'error',
-          error
-        })
-      }
-
-      res.json({
-        type: 'success',
-        message: 'Test OK',
-        result
-      })
-    })
-  })
-
   router.post('/signup', async (req, res) => {
     const  { email, password } = req.body
     if (!email || !password) {
