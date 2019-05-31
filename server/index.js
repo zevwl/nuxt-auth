@@ -3,14 +3,13 @@ require('dotenv').config()
 const express = require('express')
 const consola = require('consola')
 const { Nuxt, Builder } = require('nuxt')
-const mysql = require('mysql')
 const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const { google } = require('googleapis')
 
 const app = express()
-const db = mysql.createConnection(process.env.DB_URL)
+const db = require('./lib/mysql')
 
 // Server middleware
 app.use(bodyParser.json())

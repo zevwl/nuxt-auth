@@ -1,7 +1,5 @@
 require('dotenv').config()
 
-const db2 = require('./lib/mysql')
-
 module.exports = ({express, db, bcrypt, jwt, google}) => {
   const router =  express.Router()
 
@@ -27,34 +25,34 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
       })
     }
 
+    let result
     try {
-      const result = await db2.runQuery('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword])
-
-      const user = {
-        email,
-        id: result.insertId,
-        admin: false
-      }
-
-      const token = jwt.sign(user, process.env.SECRET)
-
-      res.json({
-        type: 'success',
-        message: 'New user created.',
-        user,
-        token
-      })
+      result = await db.runQuery('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword])
     } catch (error) {
-      console.log('server', error)
-      res.status(500).json({
+      return res.status(500).json({
         type: 'error',
         message: 'Database error',
         error
       })
     }
+
+    const user = {
+      email,
+      id: result.insertId,
+      admin: false
+    }
+
+    const token = jwt.sign(user, process.env.SECRET)
+
+    res.json({
+      type: 'success',
+      message: 'New user created.',
+      user,
+      token
+    })
   })
 
-  router.post('/login', (req, res) => {
+  router.post('/login', async (req, res) => {
     const  { email, password } = req.body
     if (!email || !password) {
       return res.status(400).json({
@@ -63,57 +61,59 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
       })
     }
 
-    db.query('SELECT * FROM users WHERE email = ?', email, (error, rows) => {
-      if (error) {
-        return res.status(500).json({
-          type: 'error',
-          message: 'Database error',
-          error
-        })
-      }
-
-      if (!rows.length) {
-        return res.status(403).json({
-          type: 'error',
-          message: 'Email not found.'
-        })
-      }
-
-      const user = rows[0]
-      bcrypt.compare(password, user.password, (error, result) => {
-        if (error) {
-          return res.status(500).json({
-            type: 'error',
-            message: 'Bcrypt error.',
-            error
-          })
-        }
-
-        if (result) {
-          res.json({
-            type: 'success',
-            message: 'User logged in.',
-            user: {
-              id: user.id,
-              email: user.email
-            },
-            token: jwt.sign({
-                id: user.id,
-                email: user.email
-              },
-              process.env.SECRET, {
-                expiresIn: '30d'
-              }
-            ),
-          })
-        } else {
-          res.status(403).json({
-            type: 'error',
-            message: 'Password is incorrect.'
-          })
-        }
+    let rows
+    try {
+      rows = await db.runQuery('SELECT * FROM users WHERE email = ?', [email])
+    } catch (error) {
+      return res.status(500).json({
+        type: 'error',
+        message: 'Database error',
+        error
       })
-    })
+    }
+
+    if (!rows.length) {
+      return res.status(403).json({
+        type: 'error',
+        message: 'Email not found.'
+      })
+    }
+
+    const user = rows[0]
+    let result
+    try {
+      result = await bcrypt.compare(password, user.password)
+    } catch (error) {
+      return res.status(500).json({
+        type: 'error',
+        message: 'Bcrypt error.',
+        error
+      })
+    }
+
+    if (result) {
+      res.json({
+        type: 'success',
+        message: 'User logged in.',
+        user: {
+          id: user.id,
+          email: user.email
+        },
+        token: jwt.sign({
+            id: user.id,
+            email: user.email
+          },
+          process.env.SECRET, {
+            expiresIn: '30d'
+          }
+        ),
+      })
+    } else {
+      res.status(403).json({
+        type: 'error',
+        message: 'Password is incorrect.'
+      })
+    }
   })
 
   router.get('/fetch', (req, res) => {
@@ -158,7 +158,7 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
     plus.people.get({
       userId: 'me',
       auth: oauth2Client
-    }, (error, response) => {
+    }, async (error, response) => {
       if (error) {
         return res.status(500).json({ type: 'error', error })
       }
@@ -171,35 +171,36 @@ module.exports = ({express, db, bcrypt, jwt, google}) => {
         })
       }
 
-      db.query('SELECT * FROM users WHERE email = ?', emails[0].value, (error, rows) => {
-        if (error) {
-          return res.status(500).json({
-            type: 'error',
-            message: 'Database error.',
-            error
-          })
-        }
-
-        if (!rows.length) {
-          return res.status(401).json({
-            type: 'error',
-            message: 'Email not found.'
-          })
-        }
-
-        const user = rows[0]
-        res.json({
-          type: 'success',
-          message: 'User logged in with Google.',
-          user: {
-            id: user.id,
-            email: user.email
-          },
-          token: jwt.sign({
-            id: user.id,
-            email: user.email
-          }, process.env.SECRET, { expiresIn: '30d' })
+      let rows
+      try {
+        rows = await db.runQuery('SELECT * FROM users WHERE email = ?', [emails[0].value])
+      } catch (error) {
+        return res.status(500).json({
+          type: 'error',
+          message: 'Database error.',
+          error
         })
+      }
+
+      if (!rows.length) {
+        return res.status(401).json({
+          type: 'error',
+          message: 'Email not found.'
+        })
+      }
+
+      const user = rows[0]
+      res.json({
+        type: 'success',
+        message: 'User logged in with Google.',
+        user: {
+          id: user.id,
+          email: user.email
+        },
+        token: jwt.sign({
+          id: user.id,
+          email: user.email
+        }, process.env.SECRET, { expiresIn: '30d' })
       })
     })
   })
